@@ -1,5 +1,6 @@
-package factory;
+package factory.SimpleFactory;
 
+import factory.SimpleFactory.SimpleFactory;
 import factory.entity.Course;
 import factory.entity.JavaCourse;
 

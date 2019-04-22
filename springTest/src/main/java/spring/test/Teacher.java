@@ -2,10 +2,11 @@ package spring.test;
 
 import org.springframework.stereotype.Component;
 
+import java.io.Serializable;
 import java.util.Random;
 
 @Component
-public class Teacher {
+public class Teacher implements Serializable {
 
     private Integer id;
 
@@ -14,6 +15,8 @@ public class Teacher {
     public Teacher() {
         generateRandomTeacher();
     }
+
+
 
     private void generateRandomTeacher() {
         Random random = new Random();

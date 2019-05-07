@@ -4,9 +4,11 @@ import framework.beans.GPBeanFactory;
 import framework.beans.config.GPBeanDefinition;
 import framework.beans.support.GPBeanDefinitionReader;
 import framework.beans.support.GPDefaultListableBeanFactory;
+import framework.beans.GPBeanWrapper;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 按之前源码分析的套路 IOC、DI、MVC、AOP
@@ -17,16 +19,49 @@ public class GPApplicationContext extends GPDefaultListableBeanFactory implement
 
     private GPBeanDefinitionReader reader;
 
+    private Map<String,Object> singletonBeanCacheMap = new ConcurrentHashMap<>();
+
+    private Map<String,GPBeanWrapper> beanWrapperMap = new ConcurrentHashMap<>();
+
     public GPApplicationContext(String... configLocations) {
         this.configLocations = configLocations;
     }
 
     public Object getBean(String beanName) {
         //初始化
-
+        GPBeanWrapper beanWrapper = instantiateBean(beanName, new GPBeanDefinition());
+        //拿到beanwrapper之后，把beanwrapper存到容器
         //注入
+        populateBean(beanName, new GPBeanDefinition(), beanWrapper);
+
 
         return null;
+    }
+
+    private void populateBean(String beanName, GPBeanDefinition gpBeanDefinition, GPBeanWrapper gpBeanWrapper) {
+    }
+
+    private GPBeanWrapper instantiateBean(String beanName, GPBeanDefinition gpBeanDefinition) {
+        //拿到要实例化的类名，
+        String className = gpBeanDefinition.getBeanClassName();
+        // 反射实例化，实例化之后得到一个对象，
+        Object instance = null;
+        try{
+            if(this.singletonBeanCacheMap.containsKey(className)){
+                instance = this.singletonBeanCacheMap.get(className);
+            }else{
+                instance = Class.forName(className).newInstance();
+                this.singletonBeanCacheMap.put(className,instance);
+                this.singletonBeanCacheMap.put(gpBeanDefinition.getFactoryBeanName(),instance);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        // 把这个对象封装到GPBeanWrapper
+        GPBeanWrapper beanWrapper = new GPBeanWrapper(instance);
+        //把GPBeanWrapper放入容器
+
+        return beanWrapper;
     }
 
     @Override

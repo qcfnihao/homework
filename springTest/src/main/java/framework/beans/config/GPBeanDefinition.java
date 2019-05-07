@@ -11,5 +11,7 @@ public class GPBeanDefinition {
 
     private String factoryBeanName;
 
+    private boolean isSinglton = true;
+
 
 }

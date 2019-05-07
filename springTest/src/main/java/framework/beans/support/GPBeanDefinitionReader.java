@@ -73,7 +73,7 @@ public class GPBeanDefinitionReader {
 
                 Class<?>[] interfaces =  beanClass.getInterfaces();
                 for (Class<?>  i : interfaces) {
-                    beanDefinitions.add(doCreateBeanDefinition(i.getName(), registryBeanClass)));
+                    beanDefinitions.add(doCreateBeanDefinition(i.getName(), registryBeanClass));
                 }
 
             }

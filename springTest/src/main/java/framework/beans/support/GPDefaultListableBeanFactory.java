@@ -4,6 +4,7 @@ import framework.beans.config.GPBeanDefinition;
 import framework.context.support.GPAbstractApplicationContext;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class GPDefaultListableBeanFactory  extends GPAbstractApplicationContext {
 

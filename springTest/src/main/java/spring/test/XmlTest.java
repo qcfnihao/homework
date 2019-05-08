@@ -8,9 +8,15 @@ public class XmlTest {
         //ioc容器初始化
         ClassPathXmlApplicationContext pathXmlApplicationContext = new ClassPathXmlApplicationContext("${path:spring.xml}");
         //DI 自动注入
+        pathXmlApplicationContext.getType("student");
         Student student = (Student) pathXmlApplicationContext.getBean("student");
-        System.out.println(student.getTeacher().toString());
+        Student student1 = (Student) pathXmlApplicationContext.getBean("student");
 
+       System.out.println(student1.getTeacher().toString());
+        //AOP
+      //  Teacher teacher = (Teacher) pathXmlApplicationContext.getBean("teacher");
+
+      //  teacher.testAop();
     /**
      *  BeanDefinition --bean的定义类，包换bean的class名称、范围、依赖关系等
      *  BeanFactory    --bean的超类工厂

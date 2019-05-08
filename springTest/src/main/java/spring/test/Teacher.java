@@ -24,6 +24,10 @@ public class Teacher implements Serializable {
         this.name = "王" + random.nextInt(10);
     }
 
+    public void testAop(){
+        System.out.println("测试aop流程");
+    }
+
     @Override
     public String toString() {
         return "id=" + id + ",name=" + name;

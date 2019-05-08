@@ -12,7 +12,7 @@ public class Student implements Serializable {
     private Teacher teacher;
 
 
-    public Teacher getTeacher() {
+    public spring.test.Teacher getTeacher() {
         return teacher;
     }
 

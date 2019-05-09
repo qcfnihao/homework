@@ -44,7 +44,8 @@ public class GPBeanDefinitionReader {
     }
 
     private void doScan(String scanPackage) {
-        URL url = this.getClass().getClassLoader().getResource("/" + scanPackage.replaceAll("\\.", "/"));
+        URL url = this.getClass()//.getClassLoader()
+                .getResource("/" + scanPackage.replaceAll("\\.", "/"));
         File classPath = new File(url.getFile());
         for (File file : classPath.listFiles()) {
             if (file.isDirectory()) {
@@ -73,7 +74,7 @@ public class GPBeanDefinitionReader {
 
                 Class<?>[] interfaces =  beanClass.getInterfaces();
                 for (Class<?>  i : interfaces) {
-                    beanDefinitions.add(doCreateBeanDefinition(i.getName(), registryBeanClass));
+                    beanDefinitions.add(doCreateBeanDefinition(registryBeanClass,i.getName()));
                 }
 
             }

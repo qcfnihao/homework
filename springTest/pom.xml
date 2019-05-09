@@ -60,6 +60,18 @@
             <version>1.8.13</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.25</version>
+        </dependency>
+
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.2.3</version>
+        </dependency>
+
         <!--spring 事务管理   依赖context-->
         <!--<dependency>
             <groupId>org.springframework</groupId>

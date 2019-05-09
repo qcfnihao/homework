@@ -6,5 +6,7 @@ package framework.context.support;
  */
 public abstract class GPAbstractApplicationContext  {
 
-    public  void  refresh(){}
+    public  void  refresh() throws Exception{
+
+    };
 }

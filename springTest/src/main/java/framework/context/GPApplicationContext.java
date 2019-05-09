@@ -135,6 +135,10 @@ public class GPApplicationContext extends GPDefaultListableBeanFactory implement
             super.beanDefinitionMap.put(beanDefinition.getFactoryBeanName(), beanDefinition);
         }
     }
+
+    public String[] getDeanDefinitionNames(){
+        return this.beanDefinitionMap.keySet().toArray(new String[this.beanDefinitionMap.size()]);
+    }
 }
 
 

@@ -22,7 +22,7 @@ public class GPBeanDefinitionReader {
 
     public GPBeanDefinitionReader(String... locations) {
         //通过URL定位找到其对应的文件，然后转换为文件流读取
-        InputStream is = this.getClass().getClassLoader().getResourceAsStream(locations[0].replace("classpath", ""));
+        InputStream is = this.getClass().getClassLoader().getResourceAsStream(locations[0].replace("classpath:", ""));
         try {
             config.load(is);
         } catch (IOException e) {

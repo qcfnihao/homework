@@ -19,7 +19,7 @@ import framework.webmvc.servlet.GPModelAndView;
 
 /**
  * 公布接口url
- * @author Tom
+ *
  *
  */
 @GPController
@@ -35,7 +35,9 @@ public class MyAction {
 	public GPModelAndView query(HttpServletRequest request, HttpServletResponse response,
 								@GPRequestParam("name") String name){
 		String result = queryService.query(name);
-		return out(response,result);
+		Map<String,Object> model = new HashMap<String,Object>();
+		model.put("teacher",name);
+		return  new GPModelAndView("first.html",model);
 	}
 	
 	@GPRequestMapping("/add*.json")
@@ -48,7 +50,7 @@ public class MyAction {
 		} catch (Exception e) {
 //			e.printStackTrace();
 			Map<String,Object> model = new HashMap<String,Object>();
-			model.put("detail",e.getCause().getMessage());
+			model.put("detail",e.getMessage());
 //			System.out.println(Arrays.toString(e.getStackTrace()).replaceAll("\\[|\\]",""));
 			model.put("stackTrace", Arrays.toString(e.getStackTrace()).replaceAll("\\[|\\]",""));
 			return new GPModelAndView("500",model);

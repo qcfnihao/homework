@@ -3,8 +3,14 @@ package framework.context;
 import framework.annotation.GPAutowired;
 import framework.annotation.GPController;
 import framework.annotation.GPService;
+import framework.aop.GPAopProxy;
+import framework.aop.GPCglibAopProxy;
+import framework.aop.GPJdkDynamicAopProxy;
+import framework.aop.config.GPAopConfig;
+import framework.aop.support.GPAdvisedSupport;
 import framework.beans.GPBeanFactory;
 import framework.beans.config.GPBeanDefinition;
+import framework.beans.config.GPBeanPostProcessor;
 import framework.beans.support.GPBeanDefinitionReader;
 import framework.beans.support.GPDefaultListableBeanFactory;
 import framework.beans.GPBeanWrapper;
@@ -12,6 +18,7 @@ import framework.beans.GPBeanWrapper;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -42,15 +49,26 @@ public class GPApplicationContext extends GPDefaultListableBeanFactory implement
 
     public Object getBean(String beanName) {
         //初始化
-        GPBeanDefinition gpBeanDefinition = this.beanDefinitionMap.get(beanName);
-        Object instance = null;
-        instance = instantiateBean(beanName, gpBeanDefinition);
-        //拿到beanwrapper之后，把beanwrapper存到容器
-        GPBeanWrapper beanWrapper = new GPBeanWrapper(instance);
-        this.factoryBeanInstanceCache.put(beanName, beanWrapper);
-        //注入
-        populateBean(beanName, gpBeanDefinition, beanWrapper);
-        return this.factoryBeanInstanceCache.get(beanName).getWrappedInstance();
+        try {
+            GPBeanDefinition gpBeanDefinition = this.beanDefinitionMap.get(beanName);
+            Object instance = instantiateBean(beanName, gpBeanDefinition);
+            if (null == instance) {
+                return null;
+            }
+            GPBeanPostProcessor beanPostProcessor = new GPBeanPostProcessor();
+            beanPostProcessor.postProcessBeforeInitialization(instance, beanName);
+
+            //拿到beanwrapper之后，把beanwrapper存到容器
+            GPBeanWrapper beanWrapper = new GPBeanWrapper(instance);
+            this.factoryBeanInstanceCache.put(beanName, beanWrapper);
+            beanPostProcessor.postProcessAfterInitialization(instance, beanName);
+            //注入
+            populateBean(beanName, gpBeanDefinition, beanWrapper);
+            return this.factoryBeanInstanceCache.get(beanName).getWrappedInstance();
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
     }
 
     private void populateBean(String beanName, GPBeanDefinition gpBeanDefinition, GPBeanWrapper gpBeanWrapper) {
@@ -92,7 +110,14 @@ public class GPApplicationContext extends GPDefaultListableBeanFactory implement
             if (this.factoryBeanObjectCache.containsKey(className)) {
                 instance = this.factoryBeanObjectCache.get(className);
             } else {
-                instance = Class.forName(className).newInstance();
+                Class<?> clazz = Class.forName(className);
+                instance = clazz.newInstance();
+                GPAdvisedSupport config = instantionAopConfig(gpBeanDefinition);
+                config.setTargetClass(clazz);
+                config.setTarget(instance);
+                if(config.pointCutMathch()){
+                    instance = createProxy(config).getProxy();
+                }
                 this.factoryBeanObjectCache.put(className, instance);
                 this.factoryBeanObjectCache.put(gpBeanDefinition.getFactoryBeanName(), instance);
             }
@@ -100,6 +125,25 @@ public class GPApplicationContext extends GPDefaultListableBeanFactory implement
             e.printStackTrace();
         }
         return instance;
+    }
+
+    private GPAopProxy createProxy(GPAdvisedSupport config) {
+        Class targetClass = config.getTargetClass();
+        if(targetClass.getInterfaces().length > 0){
+            return new GPJdkDynamicAopProxy(config);
+        }
+        return new GPCglibAopProxy(config);
+    }
+
+    private GPAdvisedSupport instantionAopConfig(GPBeanDefinition gpBeanDefinition) {
+        GPAopConfig config = new GPAopConfig();
+        config.setPointCut(this.reader.getConfig().getProperty("pointCut"));
+        config.setAspectClass(this.reader.getConfig().getProperty("aspectClass"));
+        config.setAspectBefore(this.reader.getConfig().getProperty("aspectBefore"));
+        config.setAspectAfter(this.reader.getConfig().getProperty("aspectAfter"));
+        config.setAspectAfterThrow(this.reader.getConfig().getProperty("aspectAfterThrow"));
+        config.setAspectAfterThrowingName(this.reader.getConfig().getProperty("aspectAfterThrowingName"));
+        return new GPAdvisedSupport(config);
     }
 
     @Override
@@ -116,7 +160,7 @@ public class GPApplicationContext extends GPDefaultListableBeanFactory implement
     }
 
     //只处理非延时加载的情况
-    private void doAutoWired() {
+    private void doAutoWired()throws Exception {
 
         for (Map.Entry<String, GPBeanDefinition> beanDefinitionEntry : super.beanDefinitionMap.entrySet()) {
             String beanName = beanDefinitionEntry.getKey();
@@ -138,6 +182,10 @@ public class GPApplicationContext extends GPDefaultListableBeanFactory implement
 
     public String[] getDeanDefinitionNames(){
         return this.beanDefinitionMap.keySet().toArray(new String[this.beanDefinitionMap.size()]);
+    }
+
+    public Properties getConfig(){
+        return reader.getConfig();
     }
 }
 

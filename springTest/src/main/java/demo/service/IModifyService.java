@@ -2,7 +2,7 @@ package demo.service;
 
 /**
  * 增删改业务
- * @author Tom
+ *
  *
  */
 public interface IModifyService {

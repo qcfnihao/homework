@@ -2,11 +2,15 @@ package demo.aspect;
 
 
 import framework.aop.aspect.GPJoinPoint;
+import framework.webmvc.servlet.GPModelAndView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.Arrays;
-
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class LogAspect {
@@ -36,12 +40,26 @@ public class LogAspect {
         System.out.println("use time :" + (endTime - startTime));
     }
 
-    public void afterThrowing(GPJoinPoint joinPoint, Throwable ex) {
-        System.out.println("出现异常" +
+    public void afterThrowing(GPJoinPoint joinPoint) {
+        System.out.println("Invoker Around!!!" +
                 "\nTargetObject:" +  joinPoint.getThis() +
-                "\nArgs:" + Arrays.toString(joinPoint.getArguments()) +
-                "\nThrows:" + ex.getMessage());
+                "\nArgs:" + Arrays.toString(joinPoint.getArguments()));
 
     }
 
+    public Object  around(GPJoinPoint joinPoint) throws Throwable {
+        System.out.println("出现异常" +
+                "\nTargetObject:" +  joinPoint.getThis() +
+                "\nArgs:" + Arrays.toString(joinPoint.getArguments()) );
+        Object result = null;
+        try {
+            System.out.println("这是前置通知");
+            result = joinPoint.proceed();
+            System.out.println("这是后置通知");
+        } catch (Throwable e) {
+            System.out.println("这是抛异常通知");
+            throw  e.getCause();
+        }
+        return  result;
+    }
 }

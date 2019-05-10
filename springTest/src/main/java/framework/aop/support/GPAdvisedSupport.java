@@ -2,6 +2,7 @@ package framework.aop.support;
 
 import framework.aop.aspect.GPAfterReturningAdviceInterceptor;
 import framework.aop.aspect.GPAfterThrowingAdviceInterceptor;
+import framework.aop.aspect.GPMethodAroundAdviceInterceptor;
 import framework.aop.aspect.GPMethodBeforeAdviceInterceptor;
 import framework.aop.config.GPAopConfig;
 
@@ -66,12 +67,20 @@ public class GPAdvisedSupport {
                 if (matcher.matches()) {
                     //执行器链
                     List<Object> advices = new LinkedList<>();
+
                     if (!(null == config.getAspectBefore() || "".equals(config.getAspectBefore()))) {
                         // 创建一个Advivce
                         advices.add(new GPMethodBeforeAdviceInterceptor(aspectMethods.get(config.getAspectBefore()),
                                 aspectClass.newInstance()));
                     }
-// after
+
+                    if (!(null == config.getAspectAround() || "".equals(config.getAspectAround()))) {
+                        // 创建一个Advivce
+                        advices.add(new GPMethodAroundAdviceInterceptor(aspectMethods.get(config.getAspectAround()),
+                                aspectClass.newInstance()));
+                    }
+
+
                     if (!(null == config.getAspectAfter() || "".equals(config.getAspectAfter()))) {
                         // 创建一个Advivce
                         advices.add(new GPAfterReturningAdviceInterceptor(aspectMethods.get(config.getAspectAfter()),

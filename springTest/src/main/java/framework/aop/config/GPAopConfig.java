@@ -11,4 +11,5 @@ public class GPAopConfig {
     private String aspectClass;
     private String aspectAfterThrow;
     private String aspectAfterThrowingName;
+    private String aspectAround;
 }
